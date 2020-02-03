@@ -1,11 +1,12 @@
 #include <iostream>
 #include <ApplicationServices/ApplicationServices.h>
+#include <unistd.h>
 
 void mouse_event(CGMouseButton button, CGEventType type, CGPoint loc)
 {
     CGEventRef event = CGEventCreateMouseEvent(NULL, type, loc, button);
-    CGEventSetType(event, type);
     CGEventPost(kCGHIDEventTap, event);
+    CFRelease(event);
 }
 
 CGPoint current_loc()
@@ -22,12 +23,6 @@ void set_loc(CGFloat x, CGFloat y)
     mouse_event(kCGMouseButtonLeft, kCGEventMouseMoved, loc);
 }
 
-// void click(CGPoint loc)
-// {
-//     CGEventCreateMouseEvent(event, button(true), loc);
-//     button(false);
-// }
-
 void button(bool press)
 {
     CGEventType type;
@@ -36,7 +31,6 @@ void button(bool press)
     type = (press ? kCGEventLeftMouseDown : kCGEventLeftMouseUp);
     button = kCGMouseButtonLeft;
 
-    CGEventRef event = CGEventCreate(NULL);
     CGPoint loc = current_loc();
     mouse_event(button, type, loc);
 }
@@ -50,6 +44,8 @@ void click()
 int main()
 {
     set_loc(1251, 267);
+    usleep(10000);
     click();
+    std::cout << current_loc().x << std::endl;
     return 0;
 }
